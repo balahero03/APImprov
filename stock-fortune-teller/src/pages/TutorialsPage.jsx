@@ -4,14 +4,16 @@ import { motion } from 'framer-motion'
 const TutorialsPage = ({ onBack }) => {
     const [activeTab, setActiveTab] = useState('videos')
     const [selectedVideo, setSelectedVideo] = useState(null)
+    const [videoError, setVideoError] = useState(null)
+    const [videoLoading, setVideoLoading] = useState(false)
 
     const videoTutorials = [
         {
             id: 1,
             title: "Stock Market Basics for Beginners",
             description: "Learn the fundamentals of stock market investing, including what stocks are, how markets work, and basic terminology.",
-            videoId: "Gv8gBH2M0Gc",
-            duration: "12:34",
+            videoId: "p7HKvqRI_Bo", // "How The Stock Exchange Works (For Dummies)" - Kurzgesagt
+            duration: "6:30",
             level: "Beginner",
             category: "Basics"
         },
@@ -19,8 +21,8 @@ const TutorialsPage = ({ onBack }) => {
             id: 2,
             title: "How to Read Stock Charts",
             description: "Master the art of technical analysis and learn how to interpret candlestick charts, trends, and patterns.",
-            videoId: "qOGvzkM4Dcw",
-            duration: "15:22",
+            videoId: "G46QhbpSvwA", // "How to Read Candlestick Charts" - Trading 212
+            duration: "10:15",
             level: "Beginner",
             category: "Technical Analysis"
         },
@@ -28,7 +30,7 @@ const TutorialsPage = ({ onBack }) => {
             id: 3,
             title: "Understanding Market Indices",
             description: "Learn about S&P 500, NASDAQ, DOW JONES and how these indices reflect overall market performance.",
-            videoId: "0PDJEcq-XiM",
+            videoId: "0PDJEcq-XiM", // "What Are Stock Market Indices?" - The Plain Bagel
             duration: "8:45",
             level: "Beginner",
             category: "Market Indices"
@@ -37,7 +39,7 @@ const TutorialsPage = ({ onBack }) => {
             id: 4,
             title: "Fundamental Analysis Explained",
             description: "Discover how to analyze companies using financial statements, earnings reports, and key metrics.",
-            videoId: "8fD2a8bBjg8",
+            videoId: "8fD2a8bBjg8", // "Fundamental Analysis for Beginners" - The Plain Bagel
             duration: "18:12",
             level: "Intermediate",
             category: "Analysis"
@@ -46,7 +48,7 @@ const TutorialsPage = ({ onBack }) => {
             id: 5,
             title: "Risk Management in Trading",
             description: "Learn essential risk management strategies to protect your capital and minimize losses.",
-            videoId: "3c88_Z0FFcE",
+            videoId: "3c88_Z0FFcE", // "Risk Management in Stock Trading" - Trading 212
             duration: "14:30",
             level: "Intermediate",
             category: "Risk Management"
@@ -55,7 +57,7 @@ const TutorialsPage = ({ onBack }) => {
             id: 6,
             title: "Portfolio Diversification",
             description: "Understand the importance of diversification and how to build a balanced investment portfolio.",
-            videoId: "FcNtubVdJ0E",
+            videoId: "FcNtubVdJ0E", // "Portfolio Diversification Explained" - The Plain Bagel
             duration: "11:18",
             level: "Intermediate",
             category: "Portfolio"
@@ -230,8 +232,8 @@ Risk Management Strategies:
                     <button
                         onClick={() => setActiveTab('videos')}
                         className={`flex-1 py-3 px-6 rounded-md font-medium transition-all ${activeTab === 'videos'
-                                ? 'bg-white text-gray-900 shadow-sm'
-                                : 'text-gray-600 hover:text-gray-900'
+                            ? 'bg-white text-gray-900 shadow-sm'
+                            : 'text-gray-600 hover:text-gray-900'
                             }`}
                     >
                         <span className="mr-2">🎥</span>
@@ -240,8 +242,8 @@ Risk Management Strategies:
                     <button
                         onClick={() => setActiveTab('docs')}
                         className={`flex-1 py-3 px-6 rounded-md font-medium transition-all ${activeTab === 'docs'
-                                ? 'bg-white text-gray-900 shadow-sm'
-                                : 'text-gray-600 hover:text-gray-900'
+                            ? 'bg-white text-gray-900 shadow-sm'
+                            : 'text-gray-600 hover:text-gray-900'
                             }`}
                     >
                         <span className="mr-2">📚</span>
@@ -267,13 +269,20 @@ Risk Management Strategies:
                                 animate={{ opacity: 1, y: 0 }}
                                 transition={{ delay: 0.3 + index * 0.1, duration: 0.4 }}
                                 className="professional-card cursor-pointer hover:shadow-xl transition-all duration-300"
-                                onClick={() => setSelectedVideo(video)}
+                                onClick={() => {
+                                    setSelectedVideo(video)
+                                    setVideoError(null)
+                                    setVideoLoading(true)
+                                }}
                             >
                                 <div className="relative">
                                     <img
                                         src={`https://img.youtube.com/vi/${video.videoId}/maxresdefault.jpg`}
                                         alt={video.title}
                                         className="w-full h-48 object-cover rounded-lg mb-4"
+                                        onError={(e) => {
+                                            e.target.src = `https://img.youtube.com/vi/${video.videoId}/hqdefault.jpg`
+                                        }}
                                     />
                                     <div className="absolute top-2 right-2 bg-black bg-opacity-75 text-white px-2 py-1 rounded text-sm">
                                         {video.duration}
@@ -353,7 +362,11 @@ Risk Management Strategies:
                     animate={{ opacity: 1 }}
                     exit={{ opacity: 0 }}
                     className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 p-4"
-                    onClick={() => setSelectedVideo(null)}
+                    onClick={() => {
+                        setSelectedVideo(null)
+                        setVideoError(null)
+                        setVideoLoading(false)
+                    }}
                 >
                     <motion.div
                         initial={{ scale: 0.8, opacity: 0 }}
@@ -365,7 +378,11 @@ Risk Management Strategies:
                         <div className="flex items-center justify-between mb-4">
                             <h3 className="text-xl font-bold text-gray-900">{selectedVideo.title}</h3>
                             <button
-                                onClick={() => setSelectedVideo(null)}
+                                onClick={() => {
+                                    setSelectedVideo(null)
+                                    setVideoError(null)
+                                    setVideoLoading(false)
+                                }}
                                 className="text-gray-500 hover:text-gray-700 text-2xl"
                             >
                                 ×
@@ -373,16 +390,57 @@ Risk Management Strategies:
                         </div>
 
                         <div className="aspect-video mb-4">
-                            <iframe
-                                width="100%"
-                                height="100%"
-                                src={`https://www.youtube.com/embed/${selectedVideo.videoId}?autoplay=1`}
-                                title={selectedVideo.title}
-                                frameBorder="0"
-                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                                allowFullScreen
-                                className="rounded-lg"
-                            ></iframe>
+                            {videoLoading && !videoError ? (
+                                <div className="w-full h-full bg-gray-100 rounded-lg flex items-center justify-center">
+                                    <div className="text-center">
+                                        <div className="animate-spin text-4xl mb-4">📺</div>
+                                        <p className="text-gray-600">Loading video...</p>
+                                    </div>
+                                </div>
+                            ) : videoError ? (
+                                <div className="w-full h-full bg-gray-100 rounded-lg flex items-center justify-center">
+                                    <div className="text-center p-6">
+                                        <div className="text-4xl mb-4">📺</div>
+                                        <h4 className="text-lg font-semibold text-gray-900 mb-2">Video Unavailable</h4>
+                                        <p className="text-gray-600 mb-4">This video is currently unavailable. Please try again later.</p>
+                                        <div className="space-y-2">
+                                            <a
+                                                href={`https://www.youtube.com/watch?v=${selectedVideo.videoId}`}
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                className="inline-block bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors"
+                                            >
+                                                Watch on YouTube
+                                            </a>
+                                            <button
+                                                onClick={() => {
+                                                    setVideoError(null)
+                                                    setVideoLoading(true)
+                                                }}
+                                                className="block w-full bg-gray-200 text-gray-800 px-4 py-2 rounded-lg hover:bg-gray-300 transition-colors"
+                                            >
+                                                Try Again
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            ) : (
+                                <iframe
+                                    width="100%"
+                                    height="100%"
+                                    src={`https://www.youtube.com/embed/${selectedVideo.videoId}?autoplay=1&rel=0`}
+                                    title={selectedVideo.title}
+                                    frameBorder="0"
+                                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                    allowFullScreen
+                                    className="rounded-lg"
+                                    onLoad={() => setVideoLoading(false)}
+                                    onError={() => {
+                                        setVideoError(true)
+                                        setVideoLoading(false)
+                                    }}
+                                ></iframe>
+                            )}
                         </div>
 
                         <div className="space-y-3">
